@@ -1,9 +1,24 @@
 fileFormatVersion: 2
-guid: 1afd046ad3e334a6db4d06f33f24eaec
+guid: 25be1ddb871fa8042a240c06153ef2a0
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: janela
+    second: {fileID: 2100000, guid: f80bc3dfbf624402b94a8e233876e9ba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: parede
+    second: {fileID: 2100000, guid: a269d0419677644699c6d50e23d72c47, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: vidro
+    second: {fileID: 2100000, guid: a435a5273c832430bbd9914838a10288, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
