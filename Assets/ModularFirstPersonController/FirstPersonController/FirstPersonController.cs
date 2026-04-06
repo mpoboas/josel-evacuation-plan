@@ -115,6 +115,9 @@ public class FirstPersonController : MonoBehaviour
     private bool isCrouched = false;
     private Vector3 originalScale;
 
+    /// <summary>True while the player is in crouched posture (used by smoke / telemetry systems).</summary>
+    public bool IsCrouched => isCrouched;
+
     #endregion
     #endregion
 

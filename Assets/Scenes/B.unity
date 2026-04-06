@@ -1369,72 +1369,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
   m_PrefabInstance: {fileID: 1976000367}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &72442700
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 72442701}
-  - component: {fileID: 72442703}
-  - component: {fileID: 72442702}
-  m_Layer: 0
-  m_Name: FireSpawnpoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &72442701
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 72442700}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2, y: 0, z: -14}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1964852496}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &72442702
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 72442700}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &72442703
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 72442700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32834c5f5730e46a39a15b66a2add5b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.FireSpawnpoint
 --- !u!1001 &73716905
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7173,6 +7107,29 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
+--- !u!1 &250044882 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4459864850019384750, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+  m_PrefabInstance: {fileID: 475932007}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &250044889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250044882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b41ce61c2bf7064e90a2de1ff9c44e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerEvacuation
+  smokeSimulator: {fileID: 1007828158}
+  health: 100
+  standingHeadY: 1.8
+  crouchingHeadY: 0.8
+  dangerThreshold: 0.3
+  damagePerSecond: 15
 --- !u!1001 &251842598
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14666,15 +14623,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.245
+      value: 2.38
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.229
+      value: -0.23
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalRotation.x
@@ -14682,7 +14639,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalRotation.z
@@ -14694,7 +14651,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -14740,6 +14697,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4459864850019384750, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 250044889}
     - targetCorrespondingSourceObject: {fileID: 4459864851310106424, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       insertIndex: -1
       addedObject: {fileID: 182779837}
@@ -15022,6 +14982,66 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
   m_PrefabInstance: {fileID: 1849476433}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &494811922
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 494811924}
+  - component: {fileID: 494811923}
+  m_Layer: 0
+  m_Name: SmokeManager (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &494811923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494811922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4de764748af276147ae9a85a98d7af31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmokeSimulator
+  gridSize: {x: 10, y: 10, z: 10}
+  voxelSize: 0.6
+  sourceOffset: {x: 0, y: 0, z: 0}
+  tickRate: 0.1
+  injectionPerTick: 0.3
+  upwardFlowRate: 0.5
+  lateralFlowFactor: 0.25
+  dissipationPerTick: 0
+  blockedRefreshRate: 1
+  voxelMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  voxelMaterial: {fileID: 2100000, guid: f867768c0550c39458d236275656a1f2, type: 2}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  occupancyProbeFactor: 0.45
+  flowBlockRayPadding: 0.01
+--- !u!4 &494811924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494811922}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.794, y: 2.074, z: -15.19}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &495433644 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
@@ -18646,39 +18666,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
---- !u!1 &605599267
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 605599268}
-  m_Layer: 0
-  m_Name: Fires_Floor_-2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &605599268
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 605599267}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1125979251}
-  - {fileID: 1655511980}
-  m_Father: {fileID: 771879441}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &606810439 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
@@ -24363,77 +24350,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
   m_PrefabInstance: {fileID: 771843012}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &771879438
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 771879441}
-  - component: {fileID: 771879440}
-  - component: {fileID: 771879439}
-  m_Layer: 0
-  m_Name: FireTool
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &771879439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 771879438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18eaa9c6d105448a59d6fe4c1bc1fc98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.FireTool
-  currentMode: 0
-  gridSize: 1
-  currentFloor: 0
-  upwardSpeed: 1.2
-  pillarRadius: 0.1
-  pillarEmissionMultiplier: 20
-  pillarParticleSize: 0.4
-  ceilingSpreadSpeed: 2
-  ceilingMaxRadius: 5
-  ceilingEmissionRate: 80
-  ceilingParticleSize: 1
-  ceilingGravity: 0
---- !u!114 &771879440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 771879438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3df79decbb3714ea197f442e15ab2930, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.FireManager
---- !u!4 &771879441
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 771879438}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.18084, y: 2.02416, z: -3.33012}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 605599268}
-  - {fileID: 1964852496}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &772585439 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
@@ -29793,6 +29709,66 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
   m_PrefabInstance: {fileID: 1007645915}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1007828157
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1007828159}
+  - component: {fileID: 1007828158}
+  m_Layer: 0
+  m_Name: SmokeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1007828158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007828157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4de764748af276147ae9a85a98d7af31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmokeSimulator
+  gridSize: {x: 10, y: 10, z: 10}
+  voxelSize: 0.6
+  sourceOffset: {x: 0, y: 0, z: 0}
+  tickRate: 0.1
+  injectionPerTick: 0.3
+  upwardFlowRate: 0.5
+  lateralFlowFactor: 0.25
+  dissipationPerTick: 0
+  blockedRefreshRate: 1
+  voxelMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  voxelMaterial: {fileID: 2100000, guid: f867768c0550c39458d236275656a1f2, type: 2}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  occupancyProbeFactor: 0.45
+  flowBlockRayPadding: 0.01
+--- !u!4 &1007828159
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007828157}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.505, y: 2.074, z: 3.637}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1011357672
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32050,138 +32026,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
---- !u!1 &1125979250
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1125979251}
-  - component: {fileID: 1125979253}
-  - component: {fileID: 1125979252}
-  m_Layer: 0
-  m_Name: FireSpawnpoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1125979251
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1125979250}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3, y: -2, z: -5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 605599268}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1125979252
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1125979250}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &1125979253
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1125979250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32834c5f5730e46a39a15b66a2add5b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.FireSpawnpoint
---- !u!1 &1126181931
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1126181932}
-  - component: {fileID: 1126181934}
-  - component: {fileID: 1126181933}
-  m_Layer: 0
-  m_Name: FireSpawnpoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1126181932
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1126181931}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1964852496}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1126181933
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1126181931}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &1126181934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1126181931}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32834c5f5730e46a39a15b66a2add5b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.FireSpawnpoint
 --- !u!1001 &1127026811
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34682,72 +34526,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
   m_PrefabInstance: {fileID: 1203985202}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1206641965
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1206641966}
-  - component: {fileID: 1206641968}
-  - component: {fileID: 1206641967}
-  m_Layer: 0
-  m_Name: FireSpawnpoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1206641966
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1206641965}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3, y: 0, z: 12}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1964852496}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1206641967
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1206641965}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &1206641968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1206641965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32834c5f5730e46a39a15b66a2add5b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.FireSpawnpoint
 --- !u!1001 &1208621827
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42046,68 +41824,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
   m_PrefabInstance: {fileID: 1458969484}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1459733269
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1731922867}
-    m_Modifications:
-    - target: {fileID: 1393893951467989309, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_Name
-      value: Wall_Prefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -3
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 4.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
---- !u!4 &1459733270 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-  m_PrefabInstance: {fileID: 1459733269}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1460476634
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -47375,72 +47091,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 98303246973416611, guid: 019c5c6f479734c039af7c1217fefac7, type: 3}
   m_PrefabInstance: {fileID: 1655325164}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1655511979
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1655511980}
-  - component: {fileID: 1655511982}
-  - component: {fileID: 1655511981}
-  m_Layer: 0
-  m_Name: FireSpawnpoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1655511980
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1655511979}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2, y: -2, z: 11}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 605599268}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &1655511981
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1655511979}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &1655511982
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1655511979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32834c5f5730e46a39a15b66a2add5b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.FireSpawnpoint
 --- !u!1 &1655678049
 GameObject:
   m_ObjectHideFlags: 0
@@ -47471,9 +47121,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingSystem.BuildingTool
   gridSize: 1
-  buildingPalette: {fileID: 11400000, guid: 09c0e32308ff24a24815fc21d07e0e8e, type: 2}
+  buildingPalette: {fileID: 11400000, guid: 769bdcb8df4950a4bbb669204b2e0144, type: 2}
   currentMode: 1
-  currentFloor: 0
+  currentFloor: 4
   selectedPaletteIndex: 0
 --- !u!4 &1655678051
 Transform:
@@ -49396,8 +49046,6 @@ Transform:
   - {fileID: 789494209}
   - {fileID: 1984877944}
   - {fileID: 337868282}
-  - {fileID: 1817459430}
-  - {fileID: 1459733270}
   - {fileID: 1914832312}
   - {fileID: 1344607580}
   - {fileID: 750974350}
@@ -51750,68 +51398,6 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
   m_PrefabInstance: {fileID: 715859982}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &1817459429
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1731922867}
-    m_Modifications:
-    - target: {fileID: 1393893951467989309, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_Name
-      value: Wall_Prefab
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 4.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
---- !u!4 &1817459430 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9115510641068287930, guid: ec9fdb9ea18ea42bc966c2c9a151bb34, type: 3}
-  m_PrefabInstance: {fileID: 1817459429}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1817906437
 PrefabInstance:
@@ -56436,40 +56022,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
   m_PrefabInstance: {fileID: 501706530}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1964852495
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1964852496}
-  m_Layer: 0
-  m_Name: Fires_Floor_0
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1964852496
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1964852495}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1126181932}
-  - {fileID: 1206641966}
-  - {fileID: 72442701}
-  m_Father: {fileID: 771879441}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1968362648 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
@@ -58759,6 +58311,66 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1596737269044059589, guid: 9582329b072864a2c8dbd238f6906c7f, type: 3}
   m_PrefabInstance: {fileID: 2066825130}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2067447246
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2067447248}
+  - component: {fileID: 2067447247}
+  m_Layer: 0
+  m_Name: SmokeManager (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2067447247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067447246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4de764748af276147ae9a85a98d7af31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmokeSimulator
+  gridSize: {x: 10, y: 10, z: 10}
+  voxelSize: 0.6
+  sourceOffset: {x: 0, y: 0, z: 0}
+  tickRate: 0.1
+  injectionPerTick: 0.3
+  upwardFlowRate: 0.5
+  lateralFlowFactor: 0.25
+  dissipationPerTick: 0
+  blockedRefreshRate: 1
+  voxelMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  voxelMaterial: {fileID: 2100000, guid: f867768c0550c39458d236275656a1f2, type: 2}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  occupancyProbeFactor: 0.45
+  flowBlockRayPadding: 0.01
+--- !u!4 &2067447248
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067447246}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.141, y: 0.054, z: -15.19}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2069390196
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60802,4 +60414,6 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 1655678051}
   - {fileID: 475932007}
-  - {fileID: 771879441}
+  - {fileID: 1007828159}
+  - {fileID: 494811924}
+  - {fileID: 2067447248}
