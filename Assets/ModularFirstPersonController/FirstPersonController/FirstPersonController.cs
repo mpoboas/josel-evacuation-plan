@@ -1,4 +1,4 @@
-﻿// CHANGE LOG
+// CHANGE LOG
 // 
 // CHANGES || version VERSION
 //
@@ -207,8 +207,8 @@ public class FirstPersonController : MonoBehaviour
     {
         #region Camera
 
-        // Control camera movement
-        if(cameraCanMove)
+        // Control camera movement (bloqueado durante a pausa)
+        if(cameraCanMove && Time.timeScale > 0f)
         {
             yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
 
