@@ -29,14 +29,22 @@ public class DoorController : MonoBehaviour, IInteractable
             Debug.LogWarning($"[DoorController] No Animator found on '{gameObject.name}'. Assign it in the Inspector.");
     }
 
+    private void Start()
+    {
+        // Garante que nenhum trigger fica activo no arranque (evita animações auto-play)
+        if (doorAnimator != null)
+        {
+            doorAnimator.ResetTrigger(openTrigger);
+            doorAnimator.ResetTrigger(closeTrigger);
+        }
+    }
+
     /// <summary>
     /// Called by PlayerInteraction when the player presses E while looking at the handle.
     /// </summary>
     public void Interact()
     {
         if (doorAnimator == null) return;
-
-        Debug.Log("ola, " + isOpen);
 
         isOpen = !isOpen;
 
