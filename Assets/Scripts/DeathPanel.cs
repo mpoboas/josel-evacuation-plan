@@ -17,7 +17,6 @@ public class DeathPanel : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("DeathPanel: Start() chamado.");
         // Garante que o painel começa desativado
         if (deathPanelObject != null)
         {
@@ -48,7 +47,6 @@ public class DeathPanel : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
             {
-                Debug.Log("Recebeu input do Enter! A tentar carregar a cena...");
                 ReturnToMainMenu();
             }
         }
@@ -57,17 +55,11 @@ public class DeathPanel : MonoBehaviour
     private void Die()
     {
         isDead = true;
-        Debug.Log("O jogador morreu. A ativar o painel de morte...");
 
         // Ativa o painel de morte
         if (deathPanelObject != null)
         {
             deathPanelObject.SetActive(true);
-            Debug.Log("Painel de morte ativado com sucesso.");
-        }
-        else
-        {
-            Debug.LogError("ATENÇÃO: A variável 'Death Panel Object' não foi associada no Inspector! O painel não vai aparecer.");
         }
 
         // Pára o tempo no jogo para interromper movimentação/fumo
