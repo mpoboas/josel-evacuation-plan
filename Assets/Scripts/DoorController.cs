@@ -22,6 +22,7 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
     public bool isHot = false;
 
     private bool isOpen = false;
+    private bool hasBeenInspected = false;
 
     private void Awake()
     {
@@ -50,6 +51,21 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
     {
         if (doorAnimator == null) return;
 
+        // Se a porta estiver quente e o jogador a abrir SEM inspecionar primeiro
+        if (isHot && !isOpen && !hasBeenInspected)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                SmokeHealthReceiver health = playerObj.GetComponent<SmokeHealthReceiver>();
+                if (health != null)
+                {
+                    Debug.Log($"[DoorController] Player opened hot door without checking! Applying damage.");
+                    health.TakeFlameDamage(5f);
+                }
+            }
+        }
+
         isOpen = !isOpen;
 
         if (isOpen)
@@ -77,6 +93,8 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
     /// </summary>
     public InspectResult Inspect()
     {
+        hasBeenInspected = true;
+
         if (isHot)
             return new InspectResult { message = "Too Hot", isSafe = false };
         else
