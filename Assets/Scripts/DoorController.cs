@@ -17,9 +17,9 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
     [Tooltip("Trigger name defined in the Animator for the Close animation.")]
     public string closeTrigger = "Door_Close";
 
-    [Header("Temperatura")]
-    [Tooltip("Temperatura atual da porta em graus Celsius.")]
-    public float temperature = 20f;
+    [Header("Temperature")]
+    [Tooltip("Define se a porta está quente ao toque.")]
+    public bool isHot = false;
 
     private bool isOpen = false;
 
@@ -77,9 +77,9 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
     /// </summary>
     public InspectResult Inspect()
     {
-        if (temperature >= 60f)
-            return new InspectResult { message = "Está bué quente amigo", isSafe = false };
+        if (isHot)
+            return new InspectResult { message = "Too Hot", isSafe = false };
         else
-            return new InspectResult { message = "Tranquilíssimo", isSafe = true };
+            return new InspectResult { message = "Safe", isSafe = true };
     }
 }
