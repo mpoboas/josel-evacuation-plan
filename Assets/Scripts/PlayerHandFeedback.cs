@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -59,6 +60,9 @@ public class PlayerHandFeedback : MonoBehaviour
     private Coroutine _gestureRoutine;
     private bool _gesturePlaying;
     private bool _debugHoldWasActive;
+
+    /// <summary>True while any hand gesture coroutine (including heat inspect channel) is running.</summary>
+    public bool IsGestureActive => _gesturePlaying;
 
     private void Awake()
     {
@@ -125,6 +129,32 @@ public class PlayerHandFeedback : MonoBehaviour
         _gestureRoutine = StartCoroutine(GestureRoutine(kind));
     }
 
+    /// <summary>
+    /// Heat inspect: move in, hold at inspect pose for <paramref name="peakHoldSeconds"/>, move out.
+    /// Stops any running gesture first. Invokes <paramref name="onComplete"/> after the hand is hidden (or immediately if no prefab).
+    /// </summary>
+    public void PlayHeatInspectChannel(float peakHoldSeconds, Action onComplete)
+    {
+        EnsureHandRoot();
+
+        if (_gestureRoutine != null)
+        {
+            StopCoroutine(_gestureRoutine);
+            _gestureRoutine = null;
+        }
+
+        _gesturePlaying = false;
+
+        if (handModelPrefab == null)
+        {
+            onComplete?.Invoke();
+            return;
+        }
+
+        peakHoldSeconds = Mathf.Max(0f, peakHoldSeconds);
+        _gestureRoutine = StartCoroutine(HeatInspectChannelRoutine(peakHoldSeconds, onComplete));
+    }
+
     private IEnumerator GestureRoutine(HandGestureKind kind)
     {
         _gesturePlaying = true;
@@ -174,6 +204,32 @@ public class PlayerHandFeedback : MonoBehaviour
 
         _handInstanceRoot.localPosition = toPos;
         _handInstanceRoot.localRotation = toRot;
+    }
+
+    private IEnumerator HeatInspectChannelRoutine(float peakHoldSeconds, Action onComplete)
+    {
+        _gesturePlaying = true;
+
+        EnsureHandInstance();
+        _handInstanceRoot.gameObject.SetActive(true);
+
+        var targetRot = Quaternion.Euler(inspectHandEuler);
+        var hiddenRot = Quaternion.Euler(interactHandEuler);
+
+        _handInstanceRoot.localPosition = hiddenLocalPosition;
+        _handInstanceRoot.localRotation = hiddenRot;
+
+        yield return LerpLocalPose(hiddenLocalPosition, hiddenRot, visibleLocalPosition, targetRot, moveInDuration);
+
+        if (peakHoldSeconds > 0f)
+            yield return new WaitForSeconds(peakHoldSeconds);
+
+        yield return LerpLocalPose(visibleLocalPosition, targetRot, hiddenLocalPosition, hiddenRot, moveOutDuration);
+
+        _handInstanceRoot.gameObject.SetActive(false);
+        _gesturePlaying = false;
+        _gestureRoutine = null;
+        onComplete?.Invoke();
     }
 
     private void EnsureHandInstance()

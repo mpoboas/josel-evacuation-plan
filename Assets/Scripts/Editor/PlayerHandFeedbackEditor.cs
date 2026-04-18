@@ -36,10 +36,10 @@ public class PlayerHandFeedbackEditor : Editor
                 ((PlayerHandFeedback)t).PlayGesture(PlayerHandFeedback.HandGestureKind.Interact);
         }
 
-        if (GUILayout.Button("Play Inspect (R)"))
+        if (GUILayout.Button("Play heat inspect channel (R, ~2.5s hold)"))
         {
             foreach (var t in targets)
-                ((PlayerHandFeedback)t).PlayGesture(PlayerHandFeedback.HandGestureKind.HeatInspect);
+                ((PlayerHandFeedback)t).PlayHeatInspectChannel(2.5f, null);
         }
 
         EditorGUI.EndDisabledGroup();

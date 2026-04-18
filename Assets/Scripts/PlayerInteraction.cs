@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,8 +49,17 @@ public class PlayerInteraction : MonoBehaviour
     [Tooltip("Cosmetic first-person hand on E / R. Leave empty to auto-use PlayerHandFeedback on the player camera, if present.")]
     [SerializeField] private PlayerHandFeedback handFeedback;
 
+    [Header("Heat inspect (R)")]
+    [Tooltip("Seconds the hand stays at the inspect pose after it reaches it. Total channel time adds move-in and move-out from Player Hand Feedback.")]
+    [Min(0f)] public float heatInspectPeakHoldSeconds = 2.5f;
+
+    [Tooltip("Optional UI for the channel bar. If unset, a small bar is created above the Reticle when possible.")]
+    [SerializeField] private HeatInspectCooldownUI heatInspectBarUi;
+
     // ── runtime state ──────────────────────────────────────────────────
     private IInteractable _currentTarget;
+    private Coroutine _heatInspectRoutine;
+    private bool _heatInspectChannelRunning;
 
     // ───────────────────────────────────────────────────────────────────
 
@@ -65,8 +75,31 @@ public class PlayerInteraction : MonoBehaviour
         if (handFeedback == null && playerCamera != null)
             handFeedback = playerCamera.GetComponent<PlayerHandFeedback>();
 
+        if (heatInspectBarUi == null)
+        {
+            heatInspectBarUi = GetComponent<HeatInspectCooldownUI>();
+            if (heatInspectBarUi == null)
+                heatInspectBarUi = gameObject.AddComponent<HeatInspectCooldownUI>();
+        }
+
+        heatInspectBarUi.AutoSetup(transform);
+        heatInspectBarUi.Hide();
+
         // Hide prompt at startup
         SetPromptVisible(false);
+    }
+
+    private void OnDisable()
+    {
+        if (_heatInspectRoutine != null)
+        {
+            StopCoroutine(_heatInspectRoutine);
+            _heatInspectRoutine = null;
+        }
+
+        _heatInspectChannelRunning = false;
+        if (heatInspectBarUi != null)
+            heatInspectBarUi.Hide();
     }
 
     private void Update()
@@ -84,11 +117,11 @@ public class PlayerInteraction : MonoBehaviour
             if (Input.GetKeyDown(inspectKey))
             {
                 IInspectable inspectable = (_currentTarget as MonoBehaviour)?.GetComponent<IInspectable>();
-                if (inspectable != null)
+                if (inspectable != null && !_heatInspectChannelRunning)
                 {
-                    handFeedback?.PlayGesture(PlayerHandFeedback.HandGestureKind.HeatInspect);
-                    InspectResult result = inspectable.Inspect();
-                    inspectUI?.ShowToast(result);
+                    if (_heatInspectRoutine != null)
+                        StopCoroutine(_heatInspectRoutine);
+                    _heatInspectRoutine = StartCoroutine(HeatInspectChannelRoutine(inspectable));
                 }
             }
         }
@@ -149,6 +182,45 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (interactPrompt != null)
             interactPrompt.gameObject.SetActive(visible);
+    }
+
+    private IEnumerator HeatInspectChannelRoutine(IInspectable inspectable)
+    {
+        _heatInspectChannelRunning = true;
+
+        try
+        {
+            float peak = heatInspectPeakHoldSeconds;
+            float moveIn = handFeedback != null ? handFeedback.moveInDuration : 0.35f;
+            float moveOut = handFeedback != null ? handFeedback.moveOutDuration : 0.35f;
+            float total = moveIn + peak + moveOut;
+
+            heatInspectBarUi.AutoSetup(transform);
+            heatInspectBarUi.Show();
+
+            handFeedback?.PlayHeatInspectChannel(peak, null);
+
+            for (float elapsed = 0f; elapsed < total;)
+            {
+                elapsed += Time.deltaTime;
+                heatInspectBarUi.SetFillRemaining(1f - Mathf.Clamp01(elapsed / total));
+                yield return null;
+            }
+
+            heatInspectBarUi.Hide();
+            heatInspectBarUi.SetFillRemaining(1f);
+
+            while (handFeedback != null && handFeedback.IsGestureActive)
+                yield return null;
+
+            InspectResult result = inspectable.Inspect();
+            inspectUI?.ShowToast(result);
+        }
+        finally
+        {
+            _heatInspectChannelRunning = false;
+            _heatInspectRoutine = null;
+        }
     }
 
     // ── editor visualisation ────────────────────────────────────────────
