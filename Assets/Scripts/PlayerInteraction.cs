@@ -44,6 +44,10 @@ public class PlayerInteraction : MonoBehaviour
     [Tooltip("Componente InspectUI para mostrar o toast de inspeção.")]
     public InspectUI inspectUI;
 
+    [Header("Hand feedback (optional)")]
+    [Tooltip("Cosmetic first-person hand on E / R. Leave empty to auto-use PlayerHandFeedback on the player camera, if present.")]
+    [SerializeField] private PlayerHandFeedback handFeedback;
+
     // ── runtime state ──────────────────────────────────────────────────
     private IInteractable _currentTarget;
 
@@ -58,6 +62,9 @@ public class PlayerInteraction : MonoBehaviour
             Debug.LogError("[PlayerInteraction] No camera found! " +
                            "Assign 'playerCamera' in the Inspector.");
 
+        if (handFeedback == null && playerCamera != null)
+            handFeedback = playerCamera.GetComponent<PlayerHandFeedback>();
+
         // Hide prompt at startup
         SetPromptVisible(false);
     }
@@ -69,13 +76,17 @@ public class PlayerInteraction : MonoBehaviour
         if (_currentTarget != null)
         {
             if (Input.GetKeyDown(interactKey))
+            {
+                handFeedback?.PlayGesture(PlayerHandFeedback.HandGestureKind.Interact);
                 _currentTarget.Interact();
+            }
 
             if (Input.GetKeyDown(inspectKey))
             {
                 IInspectable inspectable = (_currentTarget as MonoBehaviour)?.GetComponent<IInspectable>();
                 if (inspectable != null)
                 {
+                    handFeedback?.PlayGesture(PlayerHandFeedback.HandGestureKind.HeatInspect);
                     InspectResult result = inspectable.Inspect();
                     inspectUI?.ShowToast(result);
                 }
