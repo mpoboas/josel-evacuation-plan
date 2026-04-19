@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using BuildingSystem;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -214,10 +213,10 @@ public class StaticMapGenerator : MonoBehaviour
         int floorIndex = 0;
         if (floorRoot == null)
         {
-            if (!TryFindFloorRoot(transform, out floorRoot, out floorIndex))
+            if (!BuildingFloorNaming.TryFindFloorRoot(transform, out floorRoot, out floorIndex))
                 Debug.LogWarning("[StaticMapGenerator] Could not resolve Floor N parent; capturing without floor isolation.", this);
         }
-        else if (!TryParseFloorLevelFromName(floorRoot.name, out floorIndex))
+        else if (!BuildingFloorNaming.TryParseFloorLevelFromName(floorRoot.name, out floorIndex))
         {
             Debug.LogWarning("[StaticMapGenerator] floorRootOverride is not named \"Floor N\"; using floor index 0 for capture range.", this);
             floorIndex = 0;
@@ -438,7 +437,7 @@ public class StaticMapGenerator : MonoBehaviour
         for (int i = 0; i < buildingRoot.childCount; i++)
         {
             var ch = buildingRoot.GetChild(i);
-            if (!TryParseFloorLevelFromName(ch.name, out int level))
+            if (!BuildingFloorNaming.TryParseFloorLevelFromName(ch.name, out int level))
                 continue;
             if (level >= minVisible && level <= currentFloorLevel)
                 continue;
@@ -457,33 +456,6 @@ public class StaticMapGenerator : MonoBehaviour
         }
     }
 
-    private static readonly Regex s_FloorRegex = new Regex(@"^Floor\s+(-?\d+)\s*$", RegexOptions.CultureInvariant);
-
-    private static bool TryParseFloorLevelFromName(string objectName, out int floorLevel)
-    {
-        floorLevel = 0;
-        var m = s_FloorRegex.Match(objectName);
-        if (!m.Success)
-            return false;
-        floorLevel = int.Parse(m.Groups[1].Value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture);
-        return true;
-    }
-
-    private static bool TryFindFloorRoot(Transform start, out Transform floorRoot, out int floorIndex)
-    {
-        floorRoot = null;
-        floorIndex = 0;
-        for (var p = start; p != null; p = p.parent)
-        {
-            if (!TryParseFloorLevelFromName(p.name, out floorIndex))
-                continue;
-            floorRoot = p;
-            return true;
-        }
-
-        return false;
-    }
-
     /// <summary>Bounds all renderers under each <c>Floor K</c> child where <c>K</c> is in <c>[currentFloor − floorsBelow, currentFloor]</c>.</summary>
     private static void FitOrthoCameraToVisibleFloors(Camera cam, Transform buildingRoot, int currentFloor, int floorsBelow, float padding)
     {
@@ -494,7 +466,7 @@ public class StaticMapGenerator : MonoBehaviour
         for (int i = 0; i < buildingRoot.childCount; i++)
         {
             var ch = buildingRoot.GetChild(i);
-            if (!TryParseFloorLevelFromName(ch.name, out int level))
+            if (!BuildingFloorNaming.TryParseFloorLevelFromName(ch.name, out int level))
                 continue;
             if (level < minLevel || level > currentFloor)
                 continue;
