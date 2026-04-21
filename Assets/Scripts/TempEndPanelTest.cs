@@ -32,20 +32,12 @@ public class TempEndPanelTest : MonoBehaviour
     {
         if (endPanelRoot != null)
         {
-            // Try to call the official Show() method first
+            // Ensure the official controller is present so the replay widget auto-wires itself.
             EndPanelController controller = endPanelRoot.GetComponent<EndPanelController>();
-            if (controller != null)
-            {
-                controller.Show();
-            }
-            else
-            {
-                // Fallback if the script is missing
-                endPanelRoot.SetActive(true);
-                Time.timeScale = 0f;
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
+            if (controller == null)
+                controller = endPanelRoot.AddComponent<EndPanelController>();
+
+            controller.Show();
 
             Debug.Log("[EndPanelTest] Test call complete.");
         }

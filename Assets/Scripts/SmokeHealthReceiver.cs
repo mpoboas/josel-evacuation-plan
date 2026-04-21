@@ -62,6 +62,14 @@ public class SmokeHealthReceiver : MonoBehaviour
         }
 
         health -= damageAmount;
+        var stats = GameplaySessionStats.Instance;
+        if (stats != null)
+        {
+            if (sourceLabel == "Smoke")
+                stats.RegisterSmokeDamage(damageAmount);
+            else if (sourceLabel == "Flame")
+                stats.RegisterFireDamage(damageAmount, transform.position);
+        }
 
         if (logPostureInfoOnDamage)
         {

@@ -23,6 +23,8 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
 
     private bool isOpen = false;
     private bool hasBeenInspected = false;
+    public bool IsOpen => isOpen;
+    public bool HasBeenInspected => hasBeenInspected;
 
     private void Awake()
     {
@@ -78,6 +80,8 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
             doorAnimator.ResetTrigger(openTrigger);
             doorAnimator.SetTrigger(closeTrigger);
         }
+
+        GameplaySessionStats.Instance?.RegisterDoorStateChanged(this, isOpen, transform.position);
     }
 
     /// <summary>
@@ -94,6 +98,7 @@ public class DoorController : MonoBehaviour, IInteractable, IInspectable
     public InspectResult Inspect()
     {
         hasBeenInspected = true;
+        GameplaySessionStats.Instance?.RegisterDoorHeatChecked(this, transform.position);
 
         if (isHot)
             return new InspectResult { message = "Too Hot", isSafe = false };
