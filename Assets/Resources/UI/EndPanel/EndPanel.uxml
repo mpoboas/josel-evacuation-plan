@@ -1,0 +1,87 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/EndPanel/EndPanel.uss?fileID=7433441132597879392&amp;guid=71daf0532b5ab3d41bd8c4d458e8581d&amp;type=3#EndPanel"/>
+    <ui:VisualElement name="root-panel" picking-mode="Position" class="root-panel">
+        <ui:VisualElement class="header-bar">
+            <ui:Label text="THE EVACUATION PLAN" class="title-text"/>
+            <ui:VisualElement class="tabs-row">
+                <ui:Button name="tab-evaluation" text="EVALUATION" class="tab tab-active"/>
+                <ui:Button name="tab-logs" text="LOGS" class="tab"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="body-content" class="body-content">
+            <ui:VisualElement name="panel-evaluation" class="panel-evaluation">
+                <ui:VisualElement class="body-row">
+                    <ui:VisualElement class="stats-column">
+                        <ui:Label text="EVALUATION" class="section-title"/>
+                        <ui:VisualElement class="stats-rows">
+                            <ui:VisualElement class="stat-row stat-row-dark">
+                                <ui:Label text="TIME ELAPSED" class="stat-label"/>
+                                <ui:Label name="stats-time-value" text="0:00" class="stat-value"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="stat-row stat-row-mid">
+                                <ui:Label text="SMOKE DAMAGE" class="stat-label"/>
+                                <ui:Label name="stats-smoke-value" text="0" class="stat-value"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="stat-row stat-row-dark">
+                                <ui:Label text="FIRE DAMAGE" class="stat-label"/>
+                                <ui:Label name="stats-fire-value" text="0" class="stat-value"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="stat-row stat-row-mid">
+                                <ui:Label text="DOORS CLOSED" class="stat-label"/>
+                                <ui:Label name="stats-doors-closed-value" text="0 / 0" class="stat-value"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="stat-row stat-row-dark">
+                                <ui:Label text="DOORS CHECKED" class="stat-label"/>
+                                <ui:Label name="stats-doors-checked-value" text="0 / 0" class="stat-value"/>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="score-box">
+                            <ui:Label name="score-value" text="EVALUATION SCORE: —" class="score-text"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="map-column">
+                        <ui:VisualElement class="map-chrome-row">
+                            <ui:Label name="map-floor-label" text="MAP: — | FLOOR —" class="map-badge"/>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="map-frame">
+                            <ui:VisualElement name="map-stack" class="map-stack">
+                                <ui:Image name="map-base" class="map-layer"/>
+                                <ui:Image name="map-heat" class="map-layer"/>
+                                <ui:Image name="map-path" class="map-layer"/>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="timeline-block">
+                            <ui:VisualElement class="timeline-row">
+                                <ui:Label name="replay-time-left" text="0:00" class="replay-time-label"/>
+                                <ui:Slider name="replay-seek-slider" low-value="0" high-value="1" value="0" class="replay-slider"/>
+                                <ui:Label name="replay-time-right" text="0:00" class="replay-time-label"/>
+                            </ui:VisualElement>
+                            <ui:VisualElement class="replay-controls-row">
+                                <ui:Button name="btn-replay-restart" text="REPLAY" class="replay-control-btn"/>
+                                <ui:Button name="btn-play" text="PLAY" class="replay-control-btn replay-control-btn-accent"/>
+                                <ui:Button name="btn-pause" text="PAUSE" class="replay-control-btn"/>
+                                <ui:VisualElement class="mode-buttons">
+                                    <ui:Button name="btn-mode-trace" text="TRACE" class="mode-btn"/>
+                                    <ui:Button name="btn-mode-heat" text="HEAT MAP" class="mode-btn"/>
+                                    <ui:Button name="btn-mode-both" text="BOTH" class="mode-btn mode-btn-active"/>
+                                </ui:VisualElement>
+                                <ui:VisualElement class="legend-row legend-row-inline">
+                                    <ui:VisualElement class="legend-swatch"/>
+                                    <ui:Label text="PLAYER&apos;S PATH" class="legend-text"/>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="panel-logs" class="panel-logs" style="display: none;">
+                <ui:Label text="Logs will appear here in a future build." class="logs-placeholder"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="footer-bar">
+            <ui:Button name="btn-retry" text="RETRY" class="footer-btn"/>
+            <ui:Button name="btn-next-level" text="NEXT LEVEL" class="footer-btn footer-btn-primary"/>
+            <ui:Button name="btn-menu" text="MENU" class="footer-btn"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,2 @@
+/* Inherits Unity's built-in runtime control styles (buttons, labels, etc.). Required for PanelSettings. */
+@import url("unity-theme://default");

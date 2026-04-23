@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using BuildingSystem;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 /// <summary>
@@ -59,12 +61,35 @@ public class StaticMapGenerator : MonoBehaviour
     private static bool s_CaptureRunning;
     private static CaptureRunner s_Runner;
 
+    private sealed class OffscreenFloorCacheEntry
+    {
+        public Texture2D texture;
+        public Vector3 v00;
+        public Vector3 v10;
+        public Vector3 v01;
+    }
+
+    private static readonly Dictionary<int, OffscreenFloorCacheEntry> s_OffscreenFloorMaps =
+        new Dictionary<int, OffscreenFloorCacheEntry>(8);
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
     {
         s_CaptureQueue.Clear();
         s_CaptureRunning = false;
         s_Runner = null;
+        ClearOffscreenFloorMapCache();
+    }
+
+    private static void ClearOffscreenFloorMapCache()
+    {
+        foreach (var kv in s_OffscreenFloorMaps)
+        {
+            if (kv.Value?.texture != null)
+                UnityEngine.Object.Destroy(kv.Value.texture);
+        }
+
+        s_OffscreenFloorMaps.Clear();
     }
 
     private const string SignageTag = "Signage";
@@ -189,6 +214,15 @@ public class StaticMapGenerator : MonoBehaviour
         EnqueueCapture(GenerateMapImmediate);
     }
 
+    /// <summary>
+    /// Runs the same snap as <see cref="GenerateMap"/> immediately (bypasses the queue). Used by end-panel replay
+    /// so it always samples the same pixels as the in-world wall board.
+    /// </summary>
+    public void CaptureMapImmediate()
+    {
+        GenerateMapImmediate();
+    }
+
     private void GenerateMapImmediate()
     {
         if (mapCamera == null || mapImage == null || youAreHereMarker == null)
@@ -225,7 +259,7 @@ public class StaticMapGenerator : MonoBehaviour
 
         var floorStates = new List<(Transform t, bool active)>();
         if (buildingTool != null && floorRoot != null)
-            PushSiblingFloorStates(buildingTool.transform, floorIndex, floorStates);
+            PushSiblingFloorStates(buildingTool.transform, floorIndex, floorsBelowToInclude, floorStates);
 
         RenderTexture rt = null;
         var previousTarget = mapCamera.targetTexture;
@@ -275,6 +309,12 @@ public class StaticMapGenerator : MonoBehaviour
                 mapCamera.cullingMask = 1 << buildingLayer;
                 // Signage must always be visible even if it is not authored on Building.
                 PushSignageLayersToBuilding(forcedLayerStates, buildingLayer);
+                // Floor / Wall / Door FBX meshes are on Default under the PlaceableObject root; lift them for the shot.
+                if (floorRoot != null)
+                {
+                    var placeableVisited = new HashSet<GameObject>();
+                    PushPlaceableObjectHierarchyToBuilding(forcedLayerStates, placeableVisited, floorRoot, buildingLayer);
+                }
             }
             else
             {
@@ -388,6 +428,33 @@ public class StaticMapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// BuildingTool placeable prefabs (Floor/Wall/Corner/Door/Stairs/Window) set their root <c>m_Layer</c> to
+    /// <c>Building</c>, but the imported FBX meshes underneath remain on <c>Default</c>. The ortho bake culls to
+    /// <c>Building</c> only, which is why the <c>Floor_Prefab</c> surface never rendered in map captures. This
+    /// lifts only the renderer hierarchies under <see cref="PlaceableObject"/> roots onto <paramref name="buildingLayer"/>
+    /// (pair with <see cref="RestoreForcedLayers"/>). Furniture / plants / VFX do not carry <see cref="PlaceableObject"/>,
+    /// so they stay off the Building layer and out of the map.
+    /// </summary>
+    private static void PushPlaceableObjectHierarchyToBuilding(
+        List<(GameObject go, int layer)> states,
+        HashSet<GameObject> visited,
+        Transform floorRoot,
+        int buildingLayer)
+    {
+        if (floorRoot == null || buildingLayer < 0)
+            return;
+
+        var placeables = floorRoot.GetComponentsInChildren<PlaceableObject>(true);
+        for (int i = 0; i < placeables.Length; i++)
+        {
+            var p = placeables[i];
+            if (p == null)
+                continue;
+            PushHierarchyLayersToBuilding(states, visited, p.transform, buildingLayer);
+        }
+    }
+
     private static void PushSignageLayersToBuilding(
         List<(GameObject go, int layer)> states,
         int buildingLayer)
@@ -418,6 +485,19 @@ public class StaticMapGenerator : MonoBehaviour
                 go.layer = layer;
         }
         states.Clear();
+    }
+
+    /// <summary>URP: avoid shadow maps and full-screen post on one-off ortho bakes (cleaner floor plans).</summary>
+    public static void ConfigureUniversalOrthoBakeCamera(Camera cam)
+    {
+        if (cam == null)
+            return;
+        var data = cam.GetUniversalAdditionalCameraData();
+        if (data != null)
+        {
+            data.renderShadows = false;
+            data.renderPostProcessing = false;
+        }
     }
 
     private static void PushFloorCullerSuppression(List<(BuildingRuntimeFloorCuller culler, bool wasEnabled)> states)
@@ -507,6 +587,456 @@ public class StaticMapGenerator : MonoBehaviour
         fireStates.Clear();
     }
 
+
+    /// <summary>Floor index for this board (same rules as map capture).</summary>
+    public bool TryResolveFloorIndex(out int floorIndex)
+    {
+        Transform floorRoot = floorRootOverride;
+        if (floorRoot == null)
+            return BuildingFloorNaming.TryFindFloorRoot(transform, out floorRoot, out floorIndex);
+
+        if (!BuildingFloorNaming.TryParseFloorLevelFromName(floorRoot.name, out floorIndex))
+        {
+            floorIndex = 0;
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Texture currently shown on the wall board (same pixels as in-world map).</summary>
+    public Texture2D GetDisplayedMapTexture()
+    {
+        if (_ownedTexture != null)
+            return _ownedTexture;
+        if (mapImage != null && mapImage.texture is Texture2D td)
+            return td;
+        return null;
+    }
+
+    /// <summary>Drop a cached offscreen bake so <see cref="TryResolveEndPanelFloorMapPixels"/> can retry capture.</summary>
+    public static void InvalidateOffscreenFloorMap(int floorLevel)
+    {
+        if (s_OffscreenFloorMaps.TryGetValue(floorLevel, out var e) && e?.texture != null)
+            UnityEngine.Object.Destroy(e.texture);
+
+        s_OffscreenFloorMaps.Remove(floorLevel);
+    }
+
+    /// <summary>
+    /// Resolves the same map texture and world corners as the wall board for <paramref name="floorLevel"/>:
+    /// existing board bake, synchronous <see cref="CaptureMapImmediate"/>, offscreen cache, or a fresh offscreen capture.
+    /// </summary>
+    public static bool TryResolveEndPanelFloorMapPixels(
+        BuildingTool buildingTool,
+        int floorLevel,
+        Transform floorRoot,
+        float planeY,
+        out Texture2D texture,
+        out Vector3 v00,
+        out Vector3 v10,
+        out Vector3 v01)
+    {
+        texture = null;
+        v00 = v10 = v01 = default;
+
+        bool TryCorners(StaticMapGenerator g, Texture2D tex, float py, out Vector3 a, out Vector3 b, out Vector3 c)
+        {
+            a = b = c = default;
+            if (g == null || g.mapCamera == null || tex == null)
+                return false;
+            return TryGetMapViewportCornersXZ(g.mapCamera, py, out a, out b, out c, out _);
+        }
+
+        bool ValidTex(Texture2D tex)
+        {
+            return tex != null && tex.width >= 64 && tex.height >= 64 && tex.width == tex.height;
+        }
+
+        var planeCandidates = new List<float>(4);
+        void AddPlane(float y)
+        {
+            if (planeCandidates.Count >= 8)
+                return;
+            for (int i = 0; i < planeCandidates.Count; i++)
+            {
+                if (Mathf.Abs(planeCandidates[i] - y) < 0.0005f)
+                    return;
+            }
+
+            planeCandidates.Add(y);
+        }
+
+        AddPlane(planeY);
+        if (floorRoot != null)
+            AddPlane(floorRoot.position.y);
+
+        foreach (var g in FindAllGenerators())
+        {
+            if (g == null || !g.TryResolveFloorIndex(out int idx) || idx != floorLevel)
+                continue;
+            var tex = g.GetDisplayedMapTexture();
+            if (!ValidTex(tex))
+                continue;
+            for (int pi = 0; pi < planeCandidates.Count; pi++)
+            {
+                if (TryCorners(g, tex, planeCandidates[pi], out v00, out v10, out v01))
+                {
+                    texture = tex;
+                    return true;
+                }
+            }
+        }
+
+        foreach (var g in FindAllGenerators())
+        {
+            if (g == null || !g.TryResolveFloorIndex(out int idx) || idx != floorLevel)
+                continue;
+            try
+            {
+                g.CaptureMapImmediate();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning("[StaticMapGenerator] CaptureMapImmediate failed: " + ex.Message, g);
+            }
+
+            var tex = g.GetDisplayedMapTexture();
+            if (!ValidTex(tex))
+                continue;
+            for (int pi = 0; pi < planeCandidates.Count; pi++)
+            {
+                if (TryCorners(g, tex, planeCandidates[pi], out v00, out v10, out v01))
+                {
+                    texture = tex;
+                    return true;
+                }
+            }
+        }
+
+        if (TryGetOffscreenFloorMap(floorLevel, out texture, out v00, out v10, out v01) && ValidTex(texture))
+            return true;
+
+        InvalidateOffscreenFloorMap(floorLevel);
+        var template = FindFirstBoardForTemplate();
+        if (buildingTool != null && floorRoot != null &&
+            TryCaptureFloorOffscreen(buildingTool, floorRoot, floorLevel, planeY, template, out var entry) &&
+            entry != null &&
+            ValidTex(entry.texture))
+        {
+            s_OffscreenFloorMaps[floorLevel] = entry;
+            texture = entry.texture;
+            v00 = entry.v00;
+            v10 = entry.v10;
+            v01 = entry.v01;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// World XZ positions at the bottom-left, bottom-right, and top-left viewport corners projected onto a horizontal plane.
+    /// Matches texture (0,0), (1,0), (0,1) texel axes after <see cref="Camera.Render"/> into a square target.
+    /// </summary>
+    public static bool TryGetMapViewportCornersXZ(Camera cam, float planeY, out Vector3 v00, out Vector3 v10, out Vector3 v01, out Vector3 v11)
+    {
+        v00 = v10 = v01 = v11 = default;
+        if (cam == null || !cam.orthographic)
+            return false;
+
+        var plane = new Plane(Vector3.up, new Vector3(0f, planeY, 0f));
+
+        bool Hit(Vector2 uv, out Vector3 world)
+        {
+            var ray = cam.ViewportPointToRay(new Vector3(uv.x, uv.y, 0f));
+            if (!plane.Raycast(ray, out float dist))
+            {
+                world = default;
+                return false;
+            }
+
+            world = ray.GetPoint(dist);
+            return true;
+        }
+
+        return Hit(Vector2.zero, out v00) &&
+               Hit(Vector2.right, out v10) &&
+               Hit(Vector2.up, out v01) &&
+               Hit(Vector2.one, out v11);
+    }
+
+    /// <summary>
+    /// Bakes any building floors that do not already have a wall-board map texture, using the same capture pipeline
+    /// as <see cref="GenerateMap"/> (so end-panel replay can reuse pixels + framing without a visible board).
+    /// </summary>
+    public static void EnsureOffscreenFloorBakes(BuildingTool buildingTool, IReadOnlyList<PlayerMovementRecorder.FloorInfo> floors)
+    {
+        if (buildingTool == null || floors == null || floors.Count == 0)
+            return;
+
+        var template = FindFirstBoardForTemplate();
+        for (int i = 0; i < floors.Count; i++)
+            TryEnsureOffscreenFloorCacheForSingleFloor(buildingTool, floors[i], template);
+    }
+
+    /// <summary>
+    /// Spreads offscreen bakes and wall-board snaps across frames so opening the end panel does not hitch the game.
+    /// Run from <see cref="PlayerMovementRecorder"/> once the building is resolved.
+    /// </summary>
+    public static IEnumerator PrewarmEndPanelMapsDeferred(
+        BuildingTool buildingTool,
+        IReadOnlyList<PlayerMovementRecorder.FloorInfo> floors)
+    {
+        if (buildingTool == null || floors == null || floors.Count == 0)
+            yield break;
+
+        yield return null;
+
+        var template = FindFirstBoardForTemplate();
+        for (int i = 0; i < floors.Count; i++)
+        {
+            TryEnsureOffscreenFloorCacheForSingleFloor(buildingTool, floors[i], template);
+            yield return null;
+        }
+
+        var gens = FindAllGenerators();
+        for (int i = 0; i < gens.Length; i++)
+        {
+            var g = gens[i];
+            if (g == null)
+                continue;
+            try
+            {
+                g.CaptureMapImmediate();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning("[StaticMapGenerator] Prewarm CaptureMapImmediate failed: " + ex.Message, g);
+            }
+
+            yield return null;
+        }
+    }
+
+    private static bool TryEnsureOffscreenFloorCacheForSingleFloor(
+        BuildingTool buildingTool,
+        PlayerMovementRecorder.FloorInfo fi,
+        StaticMapGenerator template)
+    {
+        if (fi.root == null)
+            return false;
+        int level = fi.level;
+        if (FloorHasBoardBakedTexture(level))
+            return false;
+        if (s_OffscreenFloorMaps.ContainsKey(level))
+            return false;
+
+        if (!TryCaptureFloorOffscreen(buildingTool, fi.root, level, fi.worldBounds.center.y, template, out var entry) ||
+            entry == null ||
+            entry.texture == null)
+            return false;
+
+        s_OffscreenFloorMaps[level] = entry;
+        return true;
+    }
+
+    /// <summary>Offscreen bake for end-panel replay (do not destroy; owned by <see cref="StaticMapGenerator"/> cache).</summary>
+    public static bool TryGetOffscreenFloorMap(
+        int floorLevel,
+        out Texture2D texture,
+        out Vector3 v00,
+        out Vector3 v10,
+        out Vector3 v01)
+    {
+        texture = null;
+        v00 = v10 = v01 = default;
+        if (!s_OffscreenFloorMaps.TryGetValue(floorLevel, out var e) || e == null || e.texture == null)
+            return false;
+        texture = e.texture;
+        v00 = e.v00;
+        v10 = e.v10;
+        v01 = e.v01;
+        return true;
+    }
+
+    private static bool FloorHasBoardBakedTexture(int floorLevel)
+    {
+        foreach (var g in FindAllGenerators())
+        {
+            if (g == null || !g.TryResolveFloorIndex(out int idx) || idx != floorLevel)
+                continue;
+            if (g.GetDisplayedMapTexture() != null)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static StaticMapGenerator FindFirstBoardForTemplate()
+    {
+        foreach (var g in FindAllGenerators())
+        {
+            if (g != null && g.mapCamera != null)
+                return g;
+        }
+
+        return null;
+    }
+
+    private static void CopyCaptureCameraFromTemplate(Camera dst, Camera template)
+    {
+        dst.orthographic = true;
+        if (template != null)
+        {
+            dst.clearFlags = template.clearFlags;
+            dst.backgroundColor = template.backgroundColor;
+            dst.cullingMask = template.cullingMask;
+            dst.nearClipPlane = template.nearClipPlane;
+            dst.farClipPlane = template.farClipPlane;
+            dst.allowHDR = false;
+            dst.allowMSAA = false;
+        }
+        else
+        {
+            dst.clearFlags = CameraClearFlags.SolidColor;
+            dst.backgroundColor = new Color(0.12f, 0.12f, 0.14f, 1f);
+            int buildingLayer = LayerMask.NameToLayer(BuildingLayerName);
+            dst.cullingMask = buildingLayer >= 0 ? (1 << buildingLayer) : ~0;
+            dst.nearClipPlane = 0.01f;
+            dst.farClipPlane = 80f;
+            dst.allowHDR = false;
+            dst.allowMSAA = false;
+        }
+    }
+
+    private static bool TryCaptureFloorOffscreen(
+        BuildingTool buildingTool,
+        Transform floorRoot,
+        int floorIndex,
+        float planeY,
+        StaticMapGenerator template,
+        out OffscreenFloorCacheEntry entry)
+    {
+        entry = null;
+        var camGo = new GameObject("[OffscreenFloorMapCam]");
+        camGo.hideFlags = HideFlags.HideAndDontSave;
+        var cam = camGo.AddComponent<Camera>();
+        cam.enabled = false;
+        CopyCaptureCameraFromTemplate(cam, template != null ? template.mapCamera : null);
+        cam.depthTextureMode = DepthTextureMode.None;
+        ConfigureUniversalOrthoBakeCamera(cam);
+
+        int captureResolution = template != null ? Mathf.Max(64, template.captureResolution) : 1024;
+        float orthoPadding = template != null ? template.orthoPadding : 1.15f;
+        int floorsBelow = template != null ? template.floorsBelowToInclude : 1;
+        bool excludeFireAndSmoke = template == null || template.excludeFireAndSmokeFromMap;
+
+        var floorStates = new List<(Transform t, bool active)>(16);
+        PushSiblingFloorStates(buildingTool.transform, floorIndex, floorsBelow, floorStates);
+
+        RenderTexture rt = null;
+        var vfxFireStates = new List<(GameObject go, bool active)>(8);
+        var vfxSmokeStates = new List<(SmokeSimulator sim, bool wasEnabled)>(4);
+        var forcedLayerStates = new List<(GameObject go, int layer)>(64);
+        var floorCullerStates = new List<(BuildingRuntimeFloorCuller culler, bool wasEnabled)>(8);
+
+        try
+        {
+            HideAllYouAreHereMarkers();
+            foreach (var g in FindAllGenerators())
+                g.SetBoardVisualsForCapture(false);
+
+            if (buildingTool != null && floorRoot != null)
+                FitOrthoCameraToVisibleFloors(cam, buildingTool.transform, floorIndex, floorsBelow, orthoPadding);
+            else if (floorRoot != null)
+                FitOrthoCameraToFloor(cam, floorRoot, orthoPadding);
+            else
+            {
+                var refT = floorRoot != null ? floorRoot : buildingTool != null ? buildingTool.transform : null;
+                if (refT != null)
+                    DefaultTopDownCamera(cam, refT);
+            }
+
+            rt = RenderTexture.GetTemporary(captureResolution, captureResolution, 16, RenderTextureFormat.ARGB32);
+            cam.targetTexture = rt;
+            cam.gameObject.SetActive(true);
+            cam.enabled = true;
+
+            int buildingLayer = LayerMask.NameToLayer(BuildingLayerName);
+            if (buildingLayer >= 0)
+            {
+                cam.cullingMask = 1 << buildingLayer;
+                PushSignageLayersToBuilding(forcedLayerStates, buildingLayer);
+                if (floorRoot != null)
+                {
+                    var placeableVisited = new HashSet<GameObject>();
+                    PushPlaceableObjectHierarchyToBuilding(forcedLayerStates, placeableVisited, floorRoot, buildingLayer);
+                }
+            }
+
+            cam.useOcclusionCulling = false;
+            PushFloorCullerSuppression(floorCullerStates);
+
+            if (Application.isPlaying)
+                SetAllTaggedSignageRenderersEnabled(true);
+
+            if (excludeFireAndSmoke)
+                PushFireAndSmokeSuppression(vfxFireStates, vfxSmokeStates);
+
+            cam.Render();
+
+            var prevRt = RenderTexture.active;
+            RenderTexture.active = rt;
+            var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+            tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+            tex.Apply(false, true);
+            RenderTexture.active = prevRt;
+
+            if (!TryGetMapViewportCornersXZ(cam, planeY, out var c00, out var c10, out var c01, out _))
+            {
+                UnityEngine.Object.Destroy(tex);
+                return false;
+            }
+
+            entry = new OffscreenFloorCacheEntry
+            {
+                texture = tex,
+                v00 = c00,
+                v10 = c10,
+                v01 = c01,
+            };
+            return true;
+        }
+        finally
+        {
+            if (excludeFireAndSmoke)
+                PopFireAndSmokeSuppression(vfxFireStates, vfxSmokeStates);
+
+            if (Application.isPlaying)
+                SetAllTaggedSignageRenderersEnabled(false);
+
+            foreach (var g in FindAllGenerators())
+                g.SetBoardVisualsForCapture(true);
+
+            cam.targetTexture = null;
+            cam.enabled = false;
+            cam.gameObject.SetActive(false);
+            RestoreForcedLayers(forcedLayerStates);
+            PopFloorCullerSuppression(floorCullerStates);
+
+            if (rt != null)
+            {
+                RenderTexture.ReleaseTemporary(rt);
+                rt = null;
+            }
+
+            RestoreFloorStates(floorStates);
+            HideAllYouAreHereMarkers();
+            UnityEngine.Object.Destroy(camGo);
+        }
+    }
+
     private void SetBoardVisualsForCapture(bool visible)
     {
         if (mapCanvasRoot != null)
@@ -534,10 +1064,10 @@ public class StaticMapGenerator : MonoBehaviour
         return t == youAreHereMarker || t.IsChildOf(youAreHereMarker);
     }
 
-    /// <summary>Disables floor roots whose level is outside <c>[currentFloorLevel − floorsBelowToInclude, currentFloorLevel]</c>.</summary>
-    private void PushSiblingFloorStates(Transform buildingRoot, int currentFloorLevel, List<(Transform, bool)> states)
+    /// <summary>Disables floor roots whose level is outside <c>[currentFloorLevel − floorsBelow, currentFloorLevel]</c>.</summary>
+    private static void PushSiblingFloorStates(Transform buildingRoot, int currentFloorLevel, int floorsBelow, List<(Transform t, bool active)> states)
     {
-        int minVisible = currentFloorLevel - floorsBelowToInclude;
+        int minVisible = currentFloorLevel - floorsBelow;
         for (int i = 0; i < buildingRoot.childCount; i++)
         {
             var ch = buildingRoot.GetChild(i);

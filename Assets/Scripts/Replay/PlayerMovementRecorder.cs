@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using BuildingSystem;
 using UnityEngine;
@@ -46,6 +47,8 @@ public sealed class PlayerMovementRecorder : MonoBehaviour
     private float _nextSampleTime;
     private Vector3 _lastRecordedPos;
     private bool _hasAny;
+    private bool _mapPrewarmStarted;
+    private Coroutine _mapPrewarmRoutine;
 
     public IReadOnlyList<Sample> Samples => _samples;
     public IReadOnlyList<FloorInfo> Floors => _floors;
@@ -88,6 +91,13 @@ public sealed class PlayerMovementRecorder : MonoBehaviour
 
     public void ResetSession()
     {
+        if (_mapPrewarmRoutine != null)
+        {
+            StopCoroutine(_mapPrewarmRoutine);
+            _mapPrewarmRoutine = null;
+        }
+
+        _mapPrewarmStarted = false;
         _samples.Clear();
         _floors.Clear();
         _buildingTool = null;
@@ -107,6 +117,12 @@ public sealed class PlayerMovementRecorder : MonoBehaviour
         {
             TryResolveBuilding();
             if (_floors.Count == 0) return;
+        }
+
+        if (_buildingTool != null && _floors.Count > 0 && !_mapPrewarmStarted)
+        {
+            _mapPrewarmStarted = true;
+            _mapPrewarmRoutine = StartCoroutine(PrewarmEndPanelMapsRoutine());
         }
 
         float t = Time.time - _sessionStartTime;
@@ -156,6 +172,15 @@ public sealed class PlayerMovementRecorder : MonoBehaviour
                 worldBounds = ComputeFloorBounds(ch)
             });
         }
+    }
+
+    private IEnumerator PrewarmEndPanelMapsRoutine()
+    {
+        var e = StaticMapGenerator.PrewarmEndPanelMapsDeferred(_buildingTool, _floors);
+        while (e.MoveNext())
+            yield return e.Current;
+
+        _mapPrewarmRoutine = null;
     }
 
     /// <summary>Tight floor bounds; prefers <c>Building</c>-layered renderers so furniture/props don't inflate the rect.</summary>
