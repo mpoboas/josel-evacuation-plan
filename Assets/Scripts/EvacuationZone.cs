@@ -16,26 +16,26 @@ public class EvacuationZone : MonoBehaviour
         // Verify if the collider belongs to the Player
         if (other.CompareTag("Player"))
         {
-            Debug.Log($"[Evacuation] Player entered {gameObject.name}. Triggering EndPanel.");
+            Debug.Log($"[Evacuation] Player entered {gameObject.name}. Triggering success sequence.");
 
+            // 1. Prepare the EndPanel (calculate stats) but keep it HIDDEN for now
             if (endPanelController != null)
             {
-                endPanelController.Show(true);
+                // true = reachedGoal, false = activateGameObject
+                endPanelController.Show(true, false);
+            }
+
+            // 2. Trigger the SuccessPanel visual
+            var successPanel = Object.FindAnyObjectByType<SuccessPanel>(FindObjectsInactive.Include);
+            if (successPanel != null)
+            {
+                successPanel.ShowSuccess();
             }
             else
             {
-                // Fallback: try to find the controller in the scene specifically if not assigned
-                endPanelController = Object.FindAnyObjectByType<EndPanelController>(FindObjectsInactive.Include);
-                
+                Debug.LogWarning("[Evacuation] SuccessPanel not found in scene. Showing EndPanel directly as fallback.");
                 if (endPanelController != null)
-                {
-                    Debug.Log($"[Evacuation] Found EndPanelController on '{endPanelController.gameObject.name}'");
-                    endPanelController.Show(true);
-                }
-                else
-                {
-                    Debug.LogError("[Evacuation] EndPanelController not found. Please assign it in the inspector.");
-                }
+                    endPanelController.gameObject.SetActive(true);
             }
         }
     }

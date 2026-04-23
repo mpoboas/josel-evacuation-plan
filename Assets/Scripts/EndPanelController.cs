@@ -19,6 +19,7 @@ public class EndPanelController : MonoBehaviour
     [Header("Panel Configuration")]
     public TMP_Text gameText;
     public Button nextButton;
+    public GameObject hudCanvas;
 
     [Header("Stats Text (auto-resolved by default)")]
     public TMP_Text timeText;
@@ -37,7 +38,16 @@ public class EndPanelController : MonoBehaviour
             gameObject.SetActive(false);
             Debug.Log($"[EndPanel] '{gameObject.name}' activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}");
         }
+    }
 
+    private void OnEnable()
+    {
+        // Whenever this panel is enabled, ensure the HUD is hidden
+        if (_shown) 
+        {
+            Debug.Log("[EndPanel] Panel Enabled. Hiding HUD...");
+            HideHUD();
+        }
     }
 
     /// <summary>
@@ -86,6 +96,26 @@ public class EndPanelController : MonoBehaviour
         EnsureMovementReplay();
 
         Debug.Log("[EndPanel] Panel displayed.");
+    }
+
+    private void HideHUD()
+    {
+        Debug.Log("[EndPanel] Hiding HUD...");
+        if (hudCanvas != null)
+        {
+            hudCanvas.SetActive(false);
+            Debug.Log("[EndPanel] HUD_Canvas hidden via inspector reference.");
+        }
+        else
+        {
+            // Fallback: search for HUD_Canvas if not assigned
+            var hud = GameObject.Find("HUD_Canvas");
+            if (hud != null)
+            {
+                hud.SetActive(false);
+                Debug.Log("[EndPanel] HUD_Canvas hidden via fallback search.");
+            }
+        }
     }
 
     /// <summary>
