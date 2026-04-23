@@ -111,6 +111,12 @@ public class SmokeDamageTrigger : MonoBehaviour
             TryResolveReceiver();
         }
 
+        if (smokeVisionEffect != null)
+        {
+            bool suppressSmokeVisual = smokeHealthReceiver != null && smokeHealthReceiver.IsPlayerCrouched();
+            smokeVisionEffect.SetSmokeVisualSuppressed(suppressSmokeVisual);
+        }
+
         if (flameSources.Count == 0)
         {
             ScanFlameSources();

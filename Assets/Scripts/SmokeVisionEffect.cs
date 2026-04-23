@@ -4,13 +4,14 @@ using UnityEngine.UI;
 public class SmokeVisionEffect : MonoBehaviour
 {
     [Header("Trigger To Vision Mapping")]
-    [SerializeField] private float particlesForFullEffect = 140f;
+    [SerializeField] private float particlesForFullEffect = 6f;
+    [SerializeField, Range(0f, 1f)] private float minSmokeExposureWhileInside = 0.92f;
     [SerializeField] private float riseSpeed = 6f;
     [SerializeField] private float decaySpeed = 2f;
 
     [Header("Smoke Visual Strength")]
-    [SerializeField] private float maxFogAlpha = 0.35f;
-    [SerializeField] private float maxVignetteAlpha = 0.7f;
+    [SerializeField] private float maxFogAlpha = 0.96f;
+    [SerializeField] private float maxVignetteAlpha = 1f;
     
     [Header("Flame Visual Strength")]
     [SerializeField] private float maxFlameTintAlpha = 0.35f;
@@ -22,6 +23,7 @@ public class SmokeVisionEffect : MonoBehaviour
     private float smokeCurrentExposure;
     private float flameTargetExposure;
     private float flameCurrentExposure;
+    private bool suppressSmokeVisual;
 
     private void Awake()
     {
@@ -30,6 +32,12 @@ public class SmokeVisionEffect : MonoBehaviour
 
     private void Update()
     {
+        if (suppressSmokeVisual)
+        {
+            smokeTargetExposure = 0f;
+            smokeCurrentExposure = Mathf.MoveTowards(smokeCurrentExposure, 0f, riseSpeed * Time.deltaTime);
+        }
+
         smokeTargetExposure = Mathf.MoveTowards(smokeTargetExposure, 0f, decaySpeed * Time.deltaTime);
         float smokeSpeed = smokeCurrentExposure < smokeTargetExposure ? riseSpeed : decaySpeed;
         smokeCurrentExposure = Mathf.MoveTowards(
@@ -56,13 +64,28 @@ public class SmokeVisionEffect : MonoBehaviour
 
     public void SetSmokeExposure(int insideParticleCount)
     {
+        if (suppressSmokeVisual)
+        {
+            return;
+        }
+
         if (insideParticleCount <= 0)
         {
             return;
         }
 
-        float normalized = Mathf.Clamp01(insideParticleCount / Mathf.Max(1f, particlesForFullEffect));
+        float normalizedFromParticles = Mathf.Clamp01(insideParticleCount / Mathf.Max(1f, particlesForFullEffect));
+        float normalized = Mathf.Max(minSmokeExposureWhileInside, normalizedFromParticles);
         smokeTargetExposure = Mathf.Max(smokeTargetExposure, normalized);
+    }
+
+    public void SetSmokeVisualSuppressed(bool suppressed)
+    {
+        suppressSmokeVisual = suppressed;
+        if (suppressed)
+        {
+            smokeTargetExposure = 0f;
+        }
     }
 
     public void SetFlameExposure01(float normalizedExposure)
@@ -87,12 +110,12 @@ public class SmokeVisionEffect : MonoBehaviour
         canvasGO.AddComponent<GraphicRaycaster>().enabled = false;
 
         fogImage = CreateFullscreenImage(canvasGO.transform, "SmokeFog");
-        fogImage.color = new Color(0.55f, 0.55f, 0.55f, 0f);
+        fogImage.color = new Color(0.02f, 0.02f, 0.02f, 0f);
 
         vignetteImage = CreateFullscreenImage(canvasGO.transform, "SmokeVignette");
         vignetteImage.sprite = CreateVignetteSprite();
         vignetteImage.type = Image.Type.Simple;
-        vignetteImage.color = new Color(0.45f, 0.45f, 0.45f, 0f);
+        vignetteImage.color = new Color(0.01f, 0.01f, 0.01f, 0f);
 
         flameTintImage = CreateFullscreenImage(canvasGO.transform, "FlameTint");
         flameTintImage.color = new Color(0.95f, 0.12f, 0.06f, 0f);
