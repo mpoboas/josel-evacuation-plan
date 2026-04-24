@@ -316,12 +316,34 @@ public class EndPanelController : MonoBehaviour
         if (stats == null)
             return;
 
-        SetTmpText(timeText, FormatPlaytime(stats.ElapsedSeconds));
-        SetTmpText(smokeDamageText, Mathf.RoundToInt(stats.SmokeDamageTaken).ToString());
-        SetTmpText(fireDamageText, Mathf.RoundToInt(stats.FireDamageTaken).ToString());
+        // 1. Get Requirements from GameManager
+        var gm = FindAnyObjectByType<GameManager>();
+        float targetTime = 0f;
+        float maxSmoke = 0f;
+        float maxFire = 0f;
+        int reqClosed = 0;
+        int reqChecked = 0;
 
-        // DOOR STATS CALCULATION
-        int totalOpened = stats.OpenedDoorCount;
+        if (gm != null && gm.levels != null)
+        {
+            int currentLevelIndex = PlayerPrefs.GetInt("SelectedLevel", 0);
+            if (currentLevelIndex >= 0 && currentLevelIndex < gm.levels.Length)
+            {
+                var level = gm.levels[currentLevelIndex];
+                targetTime = level.targetTimeSeconds;
+                maxSmoke = level.maxSmokeDamageAllowed;
+                maxFire = level.maxFireDamageAllowed;
+                reqClosed = level.minDoorsClosedRequired;
+                reqChecked = level.minDoorsCheckedRequired;
+            }
+        }
+
+        // 2. Format displays: "Player Value / Requirement"
+        SetTmpText(timeText, $"{FormatPlaytime(stats.ElapsedSeconds)} / {FormatPlaytime(targetTime)}");
+        SetTmpText(smokeDamageText, $"{Mathf.RoundToInt(stats.SmokeDamageTaken)} / {Mathf.RoundToInt(maxSmoke)}");
+        SetTmpText(fireDamageText, $"{Mathf.RoundToInt(stats.FireDamageTaken)} / {Mathf.RoundToInt(maxFire)}");
+
+        // 3. DOOR STATS CALCULATION
         int currentlyClosedThatWereOpened = 0;
         int totalChecked = stats.HeatCheckedDoorCount;
 
@@ -344,10 +366,9 @@ public class EndPanelController : MonoBehaviour
             }
         }
 
-        // Display results: (Closed Doors / Total Opened) and (Checked Doors / Total Opened)
-        // If 0 were opened, we show 0/0 to avoid confusion
-        SetTmpText(doorsClosedText, $"{currentlyClosedThatWereOpened} / {totalOpened}");
-        SetTmpText(doorsCheckedText, $"{totalChecked} / {totalOpened}");
+        // Display results: (Current / Required)
+        SetTmpText(doorsClosedText, $"{currentlyClosedThatWereOpened} / {reqClosed}");
+        SetTmpText(doorsCheckedText, $"{totalChecked} / {reqChecked}");
     }
 
     private void ResolveUIReferences()
@@ -386,7 +407,7 @@ public class EndPanelController : MonoBehaviour
         int total = Mathf.Max(0, Mathf.RoundToInt(seconds));
         int mins = total / 60;
         int secs = total % 60;
-        return $"{mins}:{secs}";
+        return string.Format("{0}:{1:00}", mins, secs);
     }
 
     /// <summary>

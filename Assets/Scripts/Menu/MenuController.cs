@@ -19,9 +19,13 @@ public class MenuController : MonoBehaviour
     [Tooltip("The Play button inside the Level Menu. Starts disabled until a level is selected.")]
     public Button playLevelButton;
 
-    [Header("Level Stats")]
-    public TMP_Text bestScoreText;
-    public TMP_Text bestTimeText;
+    [Header("Level Selection UI")]
+    public TMP_Text levelTitleText; // Displays "Level X - Goals"
+    public TMP_Text timeGoalText;
+    public TMP_Text smokeGoalText;
+    public TMP_Text fireGoalText;
+    public TMP_Text doorsClosedGoalText;
+    public TMP_Text doorsCheckedGoalText;
 
     [Header("Scene")]
     [Tooltip("Exact name of the Game Scene as registered in Build Settings.")]
@@ -108,15 +112,31 @@ public class MenuController : MonoBehaviour
 
         Debug.Log($"[MenuController] Level {levelIndex} selected.");
 
-        // Update Best Stats UI
-        float bestScore = PlayerPrefs.GetFloat($"BestScore_Level_{levelIndex}", 0f);
-        float bestTime = PlayerPrefs.GetFloat($"BestTime_Level_{levelIndex}", 0f);
+        // 1. Update Title (Level Index + 1 for user friendly display)
+        if (levelTitleText != null)
+            levelTitleText.text = $"Level {levelIndex + 1} - Goals";
 
-        if (bestScoreText != null)
-            bestScoreText.text = bestScore > 0 ? $"Best Score: {Mathf.RoundToInt(bestScore)}%" : "Best Score: N/A";
-
-        if (bestTimeText != null)
-            bestTimeText.text = bestTime > 0 ? $"Best Time: {FormatTime(bestTime)}" : "Best Time: N/A";
+        // 2. Fetch Goals from GameManager
+        var gm = FindAnyObjectByType<GameManager>();
+        if (gm != null && gm.levels != null && levelIndex >= 0 && levelIndex < gm.levels.Length)
+        {
+            var level = gm.levels[levelIndex];
+            
+            if (timeGoalText != null) 
+                timeGoalText.text = $"Time Target: {FormatTime(level.targetTimeSeconds)}";
+            
+            if (smokeGoalText != null) 
+                smokeGoalText.text = $"Max Smoke: {Mathf.RoundToInt(level.maxSmokeDamageAllowed)}";
+            
+            if (fireGoalText != null) 
+                fireGoalText.text = $"Max Fire: {Mathf.RoundToInt(level.maxFireDamageAllowed)}";
+            
+            if (doorsClosedGoalText != null) 
+                doorsClosedGoalText.text = $"Min Doors Closed: {level.minDoorsClosedRequired}";
+            
+            if (doorsCheckedGoalText != null) 
+                doorsCheckedGoalText.text = $"Min Doors Checked: {level.minDoorsCheckedRequired}";
+        }
 
         // Unlock the Play button now that a level has been chosen
         if (playLevelButton != null)
