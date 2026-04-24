@@ -171,7 +171,7 @@ public class EndPanelController : MonoBehaviour
 
         if (scorePercentageText != null)
         {
-            scorePercentageText.text = $"{Mathf.RoundToInt(score)}%";
+            scorePercentageText.text = $"{Mathf.RoundToInt(score)}";
         }
         // -------------------------------------------------------------
 
