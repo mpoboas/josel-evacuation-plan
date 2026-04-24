@@ -27,6 +27,7 @@ public class EndPanelController : MonoBehaviour
     public TMP_Text fireDamageText;
     public TMP_Text doorsClosedText;
     public TMP_Text doorsCheckedText;
+    public Slider scoreSlider;
     public TMP_Text scorePercentageText;
 
     [Header("Internal State (for debugging)")]
@@ -162,6 +163,11 @@ public class EndPanelController : MonoBehaviour
         // 5. Doors Checked Score (20%): Ratio of checked vs required
         if (reqChecked > 0) score += Mathf.Clamp((float)stats.HeatCheckedDoorCount / reqChecked, 0f, 1f) * 20f;
         else score += 20f; // Free points if none required
+
+        if (scoreSlider != null)
+        {
+            scoreSlider.value = score / 100f;
+        }
 
         if (scorePercentageText != null)
         {
