@@ -576,7 +576,7 @@ public class EndPanelMovementReplay : MonoBehaviour
             logicalFloorIndex >= 0 &&
             logicalFloorIndex < _logicalFloorLabels.Count)
             return $"MAP: {mapTag} | {_logicalFloorLabels[logicalFloorIndex]}";
-        return $"MAP: {mapTag} | LEVEL {logicalFloorIndex + 1}";
+        return $"MAP: {mapTag} | FLOOR {logicalFloorIndex + 1}";
     }
 
     private int MapBuildingFloorToLogical(int buildingFloorLevel)

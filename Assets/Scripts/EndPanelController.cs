@@ -30,8 +30,18 @@ public class EndPanelController : MonoBehaviour
     public Slider scoreSlider;
     public TMP_Text scorePercentageText;
 
+    [Header("Tab System References")]
+    public GameObject mapPanel;
+    public GameObject logsPanel;
+    public TMP_Text logsText;
+    public Button timelineButton;
+    public Button logsButton;
+    public GameObject floorLabel;
+    public ScrollRect logsScrollRect;
+
     [Header("Internal State (for debugging)")]
     private bool _shown = false;
+    public bool IsShown => _shown;
 
     private void Awake()
     {
@@ -39,7 +49,6 @@ public class EndPanelController : MonoBehaviour
         // Hide at scene start, but not when Show() triggers activation
         if (!_shown){
             gameObject.SetActive(false);
-            Debug.Log($"[EndPanel] '{gameObject.name}' activeSelf={gameObject.activeSelf}, activeInHierarchy={gameObject.activeInHierarchy}");
         }
     }
 
@@ -48,9 +57,62 @@ public class EndPanelController : MonoBehaviour
         // Whenever this panel is enabled, ensure the HUD is hidden
         if (_shown) 
         {
-            Debug.Log("[EndPanel] Panel Enabled. Hiding HUD...");
+            Debug.Log("[EndPanel] Panel Enabled. Hiding HUD and resetting tabs...");
             HideHUD();
+            ShowMap(); // Default tab
         }
+    }
+
+    private void Start()
+    {
+        // Hook up tab buttons
+        if (timelineButton != null) timelineButton.onClick.AddListener(ShowMap);
+        if (logsButton != null) logsButton.onClick.AddListener(ShowLogs);
+    }
+
+    public void ShowMap()
+    {
+        if (mapPanel != null) mapPanel.SetActive(true);
+        if (logsPanel != null) logsPanel.SetActive(false);
+        if (floorLabel != null) floorLabel.SetActive(true);
+        UpdateButtonStyles(timelineButton, logsButton);
+    }
+
+    public void ShowLogs()
+    {
+        if (mapPanel != null) mapPanel.SetActive(false);
+        if (logsPanel != null) logsPanel.SetActive(true);
+        if (floorLabel != null) floorLabel.SetActive(false);
+        
+        GenerateLogs();
+        UpdateButtonStyles(logsButton, timelineButton);
+
+        // Reset scroll position only once
+        if (gameObject.activeInHierarchy)
+        {
+            StopAllCoroutines();
+            StartCoroutine(ResetScrollCoroutine());
+        }
+    }
+
+    private System.Collections.IEnumerator ResetScrollCoroutine()
+    {
+        // Wait 2 frames to be absolutely sure the Layout System updated the Content height
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        
+        if (logsScrollRect != null)
+        {
+            logsScrollRect.verticalNormalizedPosition = 1f;
+            Debug.Log("[EndPanel] Scroll reset to Top.");
+        }
+    }
+
+    private void UpdateButtonStyles(Button active, Button inactive)
+    {
+        // Simple visual feedback for active tab
+        if (active != null) active.interactable = false; // "Selected" look
+        if (inactive != null) inactive.interactable = true;
     }
 
     /// <summary>
@@ -139,7 +201,7 @@ public class EndPanelController : MonoBehaviour
             }
             else
             {
-                gameText.text = goalsMet ? "Successful Evacuation" : "Ineffective Evacuation";
+                gameText.text = goalsMet ? "Successful Evacuation" : "Unsuccessful Evacuation";
             }
         }
 
@@ -338,5 +400,86 @@ public class EndPanelController : MonoBehaviour
         Time.timeScale = 1f;
         // Loads the active scene name to ensure we stay in the gameplay loop
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    private void GenerateLogs()
+    {
+        if (logsText == null) return;
+        var stats = GameplaySessionStats.Instance;
+        if (stats == null) return;
+
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        sb.AppendLine("<size=120%><b>GAME INTERACTION LOG</b></size>");
+        sb.AppendLine("------------------------------------------");
+
+        // 1. Chronological Events
+        var events = stats.Events;
+        foreach (var ev in events)
+        {
+            string timeStr = $"[{FormatTime(ev.time)}]";
+            string kindStr = ev.kind.ToString();
+            
+            // Format better
+            switch (ev.kind)
+            {
+                case GameplaySessionStats.ReplayEventKind.DoorOpened: kindStr = "<color=#FFFF00>Opened Door</color>"; break;
+                case GameplaySessionStats.ReplayEventKind.DoorClosed: kindStr = "<color=#00FF00>Closed Door</color>"; break;
+                case GameplaySessionStats.ReplayEventKind.DoorHeatChecked: kindStr = "<color=#00FFFF>Checked Door Heat</color>"; break;
+                case GameplaySessionStats.ReplayEventKind.FireDamage: kindStr = "<color=#FF0000>Took Fire Damage</color>"; break;
+            }
+
+            sb.AppendLine($"{timeStr} {kindStr} at Floor {ev.floorLevel}");
+        }
+
+        sb.AppendLine("\n<size=110%><b>SAFETY AUDIT</b></size>");
+        sb.AppendLine("------------------------------------------");
+
+        // 2. Safety Logic: Check for doors opened without checking heat or left open
+        var allDoors = FindObjectsByType<DoorController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        var openedIds = stats.OpenedDoorIdsSet;
+        bool anyWarnings = false;
+
+        foreach (var door in allDoors)
+        {
+            if (door == null) continue;
+            int id = door.GetInstanceID();
+
+            if (openedIds.Contains(id))
+            {
+                if (!door.HasBeenInspected)
+                {
+                    string warning = door.isHot ? "Opened a <color=#FF6600><b>HOT DOOR</b></color> without checking heat!" : "Door opened without checking heat first.";
+                    sb.AppendLine($"<color=#FFAA00>[Warning]</color> {warning}");
+                    anyWarnings = true;
+                }
+
+                if (door.IsOpen)
+                {
+                    sb.AppendLine("<color=#FF6600>[Warning]</color> Door left <b>OPEN</b> (Fire/Smoke could spread).");
+                    anyWarnings = true;
+                }
+            }
+        }
+
+        if (!anyWarnings)
+        {
+            sb.AppendLine("<color=#00FF00>Perfect Procedure!</color> No safety protocols were breached.");
+        }
+
+        logsText.text = sb.ToString();
+
+        // FORCE Layout recalculation
+        if (logsScrollRect != null && logsScrollRect.content != null)
+        {
+            UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(logsScrollRect.content);
+        }
+    }
+
+    private string FormatTime(float totalSeconds)
+    {
+        int total = Mathf.Max(0, Mathf.RoundToInt(totalSeconds));
+        int mins = total / 60;
+        int secs = total % 60;
+        return string.Format("{0:00}:{1:00}", mins, secs);
     }
 }

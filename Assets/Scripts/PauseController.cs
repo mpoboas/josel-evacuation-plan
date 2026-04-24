@@ -16,6 +16,8 @@ public class PauseController : MonoBehaviour
     private bool jogoPausado = false;
     private readonly List<GameObject> _resolvedGameplayHudRoots = new List<GameObject>();
 
+    private EndPanelController endPanel;
+
     void Start()
     {
         // Garante que ambos os menus começam desligados quando o nível começa
@@ -24,10 +26,16 @@ public class PauseController : MonoBehaviour
 
         Time.timeScale = 1f;
         ResolveGameplayHudRoots();
+
+        // Procura o controlador do painel final (incluindo inativos, pois começa desligado)
+        endPanel = FindFirstObjectByType<EndPanelController>(FindObjectsInactive.Include);
     }
 
     void Update()
     {
+        // Se o painel final estiver visível, não fazemos nada (não deixa pausar)
+        if (endPanel != null && endPanel.IsShown) return;
+
         // Verifica se o jogador carregou na tecla ESC
         if (Input.GetKeyDown(KeyCode.Escape))
         {
