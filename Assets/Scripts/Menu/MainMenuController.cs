@@ -14,9 +14,15 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
+    [SerializeField] private LoadingPanelController loadingController;
+
     public void PlayGame()
     {
         Debug.Log("Loading B scene...");
+        if (loadingController != null)
+        {
+            loadingController.Show();
+        }
         SceneManager.LoadScene("B");
     }
 

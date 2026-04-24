@@ -39,6 +39,9 @@ public class EndPanelController : MonoBehaviour
     public GameObject floorLabel;
     public ScrollRect logsScrollRect;
 
+    [Header("Loading Screen")]
+    public LoadingPanelController loadingController;
+
     [Header("Internal State (for debugging)")]
     private bool _shown = false;
     public bool IsShown => _shown;
@@ -46,6 +49,13 @@ public class EndPanelController : MonoBehaviour
     private void Awake()
     {
         Debug.Log($"[EndPanel] Awake() called on '{gameObject.name}', _shown={_shown}");
+
+        // Ensure the score slider is read-only (visual only)
+        if (scoreSlider != null)
+        {
+            scoreSlider.interactable = false;
+        }
+
         // Hide at scene start, but not when Show() triggers activation
         if (!_shown){
             gameObject.SetActive(false);
@@ -389,6 +399,10 @@ public class EndPanelController : MonoBehaviour
     {
         // Ensure time is running before changing scenes
         Time.timeScale = 1f;
+        if (loadingController != null)
+        {
+            loadingController.Show();
+        }
         SceneManager.LoadScene(menuSceneName);
     }
 
@@ -398,6 +412,10 @@ public class EndPanelController : MonoBehaviour
     private void ReloadGameScene()
     {
         Time.timeScale = 1f;
+        if (loadingController != null)
+        {
+            loadingController.Show();
+        }
         // Loads the active scene name to ensure we stay in the gameplay loop
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

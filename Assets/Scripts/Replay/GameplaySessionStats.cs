@@ -44,7 +44,8 @@ public sealed class GameplaySessionStats : MonoBehaviour
     public int HeatCheckedDoorCount => _heatCheckedDoorIds.Count;
     public int OpenedDoorCount => _openedDoorIds.Count;
     public HashSet<int> OpenedDoorIdsSet => _openedDoorIds; // Access to check states later
-    public float ElapsedSeconds => Mathf.Max(0f, Time.time - _sessionStartTime);
+    private bool _timerStarted = false;
+    public float ElapsedSeconds => _timerStarted ? Mathf.Max(0f, Time.time - _sessionStartTime) : 0f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void BootstrapOnSceneLoad()
@@ -93,7 +94,14 @@ public sealed class GameplaySessionStats : MonoBehaviour
         DoorOpenActions = 0;
         DoorCloseActions = 0;
         _sessionStartTime = Time.time;
+        _timerStarted = false;
         _lastFireEventTime = -999f;
+    }
+
+    public void StartTimer()
+    {
+        _sessionStartTime = Time.time;
+        _timerStarted = true;
     }
 
     public void RegisterSmokeDamage(float amount)

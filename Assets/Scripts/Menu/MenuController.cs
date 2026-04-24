@@ -12,6 +12,7 @@ public class MenuController : MonoBehaviour
     public GameObject mainMenuPanel;
     public GameObject levelMenuPanel;
     public GameObject settingsMenuPanel;
+    public LoadingPanelController loadingController;
 
     [Header("Level Menu")]
     [Tooltip("The Play button inside the Level Menu. Starts disabled until a level is selected.")]
@@ -46,6 +47,10 @@ public class MenuController : MonoBehaviour
     public void PlayGame()
     {
         Debug.Log($"[MenuController] Loading scene: {gameSceneName}");
+        if (loadingController != null)
+        {
+            loadingController.Show();
+        }
         SceneManager.LoadScene(gameSceneName);
     }
 
@@ -108,6 +113,12 @@ public class MenuController : MonoBehaviour
     {
         int level = PlayerPrefs.GetInt("SelectedLevel", 0);
         Debug.Log($"[MenuController] Playing level {level} – loading scene: {gameSceneName}");
+        
+        if (loadingController != null)
+        {
+            loadingController.Show();
+        }
+
         SceneManager.LoadScene(gameSceneName);
     }
 
