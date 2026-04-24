@@ -74,23 +74,7 @@ public class GameManager : MonoBehaviour
         LevelData currentLevel = levels[selectedLevel];
 
         ConfigureLevelBoxGroups(selectedLevel);
-
-        // // 4. Teleport Player
-        // if (player != null && currentLevel.playerSpawnPoint != null)
-        // {
-        //     // Reset velocity if player has a Rigidbody or CharacterController to avoid physics glitches during teleport
-        //     CharacterController cc = player.GetComponent<CharacterController>();
-        //     if (cc != null) cc.enabled = false; // Temporarily disable to move
-
-        //     player.transform.position = currentLevel.playerSpawnPoint.position;
-        //     player.transform.rotation = currentLevel.playerSpawnPoint.rotation;
-
-        //     if (cc != null) cc.enabled = true;
-        // }
-        // else
-        // {
-        //     Debug.LogError("GameManager: Player reference or Spawn Point missing!");
-        // }
+        TeleportPlayerToSpawn(currentLevel);
 
         // 5. Deactivate all existing fires/smoke in the scene first
         // It is highly recommended to tag all your fire-related GameObjects with the "Fire" tag.
@@ -181,6 +165,56 @@ public class GameManager : MonoBehaviour
             {
                 group.SetActive(true);
             }
+        }
+    }
+
+    private void TeleportPlayerToSpawn(LevelData currentLevel)
+    {
+        if (currentLevel == null || currentLevel.playerSpawnPoint == null)
+        {
+            Debug.LogError("GameManager: Spawn Point missing for selected level.");
+            return;
+        }
+
+        if (player == null)
+        {
+            FirstPersonController controller = Object.FindAnyObjectByType<FirstPersonController>(FindObjectsInactive.Include);
+            if (controller != null)
+            {
+                player = controller.gameObject;
+            }
+        }
+
+        if (player == null)
+        {
+            Debug.LogError("GameManager: Player reference missing and no FirstPersonController found.");
+            return;
+        }
+
+        CharacterController characterController = player.GetComponent<CharacterController>();
+        if (characterController != null)
+        {
+            characterController.enabled = false;
+        }
+
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.position = currentLevel.playerSpawnPoint.position;
+            rb.rotation = currentLevel.playerSpawnPoint.rotation;
+        }
+        else
+        {
+            player.transform.SetPositionAndRotation(
+                currentLevel.playerSpawnPoint.position,
+                currentLevel.playerSpawnPoint.rotation);
+        }
+
+        if (characterController != null)
+        {
+            characterController.enabled = true;
         }
     }
 

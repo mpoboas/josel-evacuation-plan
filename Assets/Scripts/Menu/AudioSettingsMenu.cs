@@ -5,6 +5,7 @@ public class AudioSettingsMenu : MonoBehaviour
 {
     private const string FovPref = "Settings.FOV";
     private const string SensitivityPref = "Settings.Sensitivity";
+    private const string MasterVolumePref = "Audio.Master";
 
     [Header("Settings Sliders")]
     [SerializeField] private Slider fovSlider;
@@ -13,6 +14,7 @@ public class AudioSettingsMenu : MonoBehaviour
 
     private bool isBinding;
     private FirstPersonController playerController;
+    private Coroutine delayedSyncRoutine;
 
     private void Awake()
     {
@@ -24,11 +26,18 @@ public class AudioSettingsMenu : MonoBehaviour
     private void OnEnable()
     {
         SyncFromAudioManager();
+        delayedSyncRoutine = StartCoroutine(DelayedSync());
     }
 
     private void OnDestroy()
     {
+        StopDelayedSyncIfRunning();
         UnbindSliderEvents();
+    }
+
+    private void OnDisable()
+    {
+        StopDelayedSyncIfRunning();
     }
 
     public void SyncFromAudioManager()
@@ -54,7 +63,8 @@ public class AudioSettingsMenu : MonoBehaviour
 
         if (volumeSlider != null)
         {
-            float volume = GameAudioManager.Instance != null ? GameAudioManager.Instance.MasterVolume : 1f;
+            float defaultVolume = GameAudioManager.Instance != null ? GameAudioManager.Instance.MasterVolume : 1f;
+            float volume = PlayerPrefs.GetFloat(MasterVolumePref, defaultVolume);
             volumeSlider.minValue = 0f;
             volumeSlider.maxValue = 100f;
             volumeSlider.wholeNumbers = false;
@@ -178,14 +188,28 @@ public class AudioSettingsMenu : MonoBehaviour
     private float ResolveCurrentFov()
     {
         EnsurePlayerController();
-        float fallback = playerController != null ? playerController.fov : 60f;
-        return PlayerPrefs.GetFloat(FovPref, fallback);
+        return PlayerPrefs.GetFloat(FovPref, playerController != null ? playerController.fov : 60f);
     }
 
     private float ResolveCurrentSensitivity()
     {
         EnsurePlayerController();
-        float fallback = playerController != null ? playerController.mouseSensitivity : 2f;
-        return PlayerPrefs.GetFloat(SensitivityPref, fallback);
+        return PlayerPrefs.GetFloat(SensitivityPref, playerController != null ? playerController.mouseSensitivity : 2f);
+    }
+
+    private System.Collections.IEnumerator DelayedSync()
+    {
+        // Run one frame later so runtime singletons/controllers can finish Awake.
+        yield return null;
+        SyncFromAudioManager();
+    }
+
+    private void StopDelayedSyncIfRunning()
+    {
+        if (delayedSyncRoutine != null)
+        {
+            StopCoroutine(delayedSyncRoutine);
+            delayedSyncRoutine = null;
+        }
     }
 }

@@ -1,5 +1,8 @@
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [Serializable]
 public class AudioClipSet
@@ -102,6 +105,21 @@ public class GameAudioLibrary : ScriptableObject
     private static AudioClip[] ResolveMany(string[] preferredNames)
     {
         AudioClip[] loadedClips = Resources.FindObjectsOfTypeAll<AudioClip>();
+#if UNITY_EDITOR
+        // In Editor play mode, clips might exist on disk but not be loaded yet.
+        // Fall back to AssetDatabase so audio still resolves without manual wiring.
+        if (loadedClips == null || loadedClips.Length == 0)
+        {
+            string[] guids = AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets/JOSEL Audio" });
+            loadedClips = new AudioClip[guids.Length];
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
+                loadedClips[i] = AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+            }
+        }
+#endif
+
         if (loadedClips == null || loadedClips.Length == 0)
         {
             return Array.Empty<AudioClip>();
